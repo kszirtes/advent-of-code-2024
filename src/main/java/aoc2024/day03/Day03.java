@@ -15,21 +15,19 @@ public class Day03 {
             e.printStackTrace();
         }
 
-        System.out.println(lines.size());
-        System.out.println(method1("xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"));
-        System.out.println(lines.stream().mapToLong(Day03::method1).sum());
-        System.out.println(method2("xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"));
+        //System.out.println(lines.size());
+        System.out.println(lines.stream().mapToLong(Day03::method1).sum());  //182619815
 
-        System.out.println(lines.stream().mapToLong(Day03::method2).sum());
+        System.out.println(lines.stream().mapToLong(Day03::method2).sum());  //85770822 nem jó
 
         StringBuilder sb = new StringBuilder();
         lines.forEach(sb::append);
-        System.out.println(method2(sb.toString()));
+        System.out.println(method2(sb.toString()));  //80747545
 
 
     }
 
-    private static long method1(String text) {
+    protected static long method1(String text) {
         String[] muls = text.split("mul");
         long multiply = 0;
         for (String mul : muls) {
@@ -82,7 +80,7 @@ public class Day03 {
        34806505
     */
 
-    private static long method2(String text) {
+    protected static long method2(String text) {
         String[] muls = text.split("mul");
         long multiply = 0;
         boolean doIt = true;
