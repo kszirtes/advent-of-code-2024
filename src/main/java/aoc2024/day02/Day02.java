@@ -10,31 +10,19 @@ import java.util.List;
 public class Day02 {
     public static void main(String[] args) {
 
-        List<String> example = new ArrayList<>();
-        example.add("7 6 4 2 1");
-        example.add("1 2 7 8 9");
-        example.add("9 7 6 2 1");
-        example.add("1 3 2 4 5");
-        example.add("8 6 4 4 1");
-        example.add("1 3 6 7 9");
-
         List<String> lines = null;
         try {
             lines = Files.readAllLines(Path.of("inputs/day02.txt"));
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        System.out.println(example.stream().filter(Day02::isSafe).count());
-        System.out.println(lines.stream().filter(Day02::isSafe).count());
+        System.out.println(lines.stream().filter(Day02::isSafe).count());  //390
 
-        System.out.println(example.stream().filter(Day02::isSafeWithDampener).count());
-        System.out.println(lines.stream().filter(Day02::isSafeWithDampener).count());
+        System.out.println(lines.stream().filter(Day02::isSafeWithDampener).count());  //439
     }
 
-    private static boolean isSafe(String line) {
+    protected static boolean isSafe(String line) {
         String[] numbers = line.split(" ");
         if (numbers.length == 1) {
             return true;
@@ -62,7 +50,7 @@ public class Day02 {
 
     //PART 2
 
-    private static boolean isSafeWithDampener(String line) {
+    protected static boolean isSafeWithDampener(String line) {
         String[] numbers = line.split(" ");
         if (numbers.length == 0) {
             return false;
