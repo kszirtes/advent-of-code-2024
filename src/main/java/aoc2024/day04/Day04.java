@@ -17,14 +17,14 @@ public class Day04 {
         }
 
         System.out.println(calculateXMAS(lines));  //2644
-        System.out.println(calculateX_MAS(lines));
+        System.out.println(calculateX_MAS(lines));  //1952
     }
 
     protected static int calculateXMAS(List<String> lines) {
         return countXMAS(generateArray(lines));
     }
 
-    protected static char[][] generateArray(List<String> lines) {
+    public static char[][] generateArray(List<String> lines) {
         char[][] characters = new char[lines.size()][lines.get(0).length()];
         int i = 0;
         for (String line : lines) {
