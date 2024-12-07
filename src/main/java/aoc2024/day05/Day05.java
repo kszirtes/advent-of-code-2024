@@ -1,50 +1,42 @@
 package aoc2024.day05;
 
+import aoc2024.common.ListUtils;
+import aoc2024.common.Pair;
+import aoc2024.common.ReadInput;
+
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 public class Day05 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        List<String> lines = new ArrayList<>();
-        try {
-            lines = Files.readAllLines(Path.of("inputs/day05.txt"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> lines = ReadInput.readInputToList("inputs/day05.txt");
 
         List<List<Integer>> allPrint = new ArrayList<>();
         Map<Integer, List<Integer>> rules = new HashMap<>();
-        boolean isFirstPart = true;
 
         for (String line : lines) {
+            if (line != null) {
+                if (line.contains("|")) {
+                    String[] splits = line.split("\\|");
+                    List<Integer> value = new ArrayList<>();
+                    value.add(Integer.parseInt(splits[1]));
+                    rules.merge(Integer.parseInt(splits[0]), value, (x, y) -> {
+                        List<Integer> t = new ArrayList<>(x);
+                        t.addAll(y);
+                        return t;
+                    });
+                } else {
+                    List<Integer> print = new ArrayList<>();
+                    try {
+                        String[] splits = line.split(",");
+                        Arrays.stream(splits).mapToInt(Integer::parseInt).forEach(print::add);
+                        allPrint.add(print);
+                    } catch (Exception e) {
+                        System.out.println("nan");
+                    }
 
-            if (line == null || line.isEmpty()) {
-                isFirstPart = false;
-            }
-            if (isFirstPart) {
-                String[] splits = line.split("\\|");
-
-                List<Integer> value = new ArrayList<>();
-                value.add(Integer.parseInt(splits[1]));
-                rules.merge(Integer.parseInt(splits[0]), value, (x, y) -> {
-                    List<Integer> t = new ArrayList<>(x);
-                    t.addAll(y);
-                    return t;
-                });
-
-            } else {
-                List<Integer> pages = new ArrayList<>();
-                try {
-                    String[] splits = line.split(",");
-                    Arrays.stream(splits).mapToInt(Integer::parseInt).forEach(pages::add);
-                    allPrint.add(pages);
-                } catch (Exception e) {
-                    System.out.println("nan");
                 }
-
             }
         }
 
@@ -63,22 +55,38 @@ public class Day05 {
 
     protected static long sumCorrectlyOrderedMiddlePage(List<List<Integer>> allPrint, Map<Integer, List<Integer>> rules) {
         return allPrint.stream()
-                .filter(pages -> isCorrectlyOrdered(pages, rules))
+                .filter(print -> isCorrectlyOrdered(print, rules))
                 .mapToInt(Day05::returnMiddlePage).sum();
     }
 
-    protected static boolean isCorrectlyOrdered(List<Integer> pages, Map<Integer, List<Integer>> rules) {
-        for (int i = 0; i < pages.size(); i++) {
-            List<Integer> pagesLater = rules.get(pages.get(i));
-            for (int j = 0; j < i; j++) {
-                if (pagesLater != null && !pagesLater.isEmpty()) {
-                    if (pagesLater.contains(pages.get(j))) {
-                        return false;
-                    }
+    protected static boolean isCorrectlyOrdered(List<Integer> print, Map<Integer, List<Integer>> rules) {
+        long pageInBadPos = ListUtils.zipWithIndex(print).stream()
+                .filter(pair -> isThisPagBadPos(print, rules.get(pair.getFirst()), pair.getSecond()))
+                .count();
+        return (pageInBadPos == 0);
+
+//        for (int i = 0; i < print.size(); i++) {
+//            List<Integer> pagesLater = rules.get(print.get(i));
+//            for (int j = 0; j < i; j++) {
+//                if (pagesLater != null) {
+//                    if (pagesLater.contains(print.get(j))) {
+//                        return false;
+//                    }
+//                }
+//            }
+//        }
+//        return true;
+    }
+
+    private static boolean isThisPagBadPos(List<Integer> print, List<Integer> pagesLater, Integer index) {
+        for (int j = 0; j < index; j++) {
+            if (pagesLater != null) {
+                if (pagesLater.contains(print.get(j))) {
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     protected static int returnMiddlePage(List<Integer> pages) {
@@ -102,7 +110,7 @@ public class Day05 {
         for (int i = 0; i < print.size(); i++) {
             List<Integer> pagesLater = rules.get(print.get(i));
             for (int j = 0; j < i; j++) {
-                if (pagesLater != null && !pagesLater.isEmpty()) {
+                if (pagesLater != null) {
                     if (pagesLater.contains(print.get(j))) {
                         for (int k = 0; k < print.size(); k++) {
                             if (k == i) {
