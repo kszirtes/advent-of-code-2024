@@ -1,5 +1,7 @@
 package aoc2024.day02;
 
+import aoc2024.common.ReadInput;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,14 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Day02 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        List<String> lines = null;
-        try {
-            lines = Files.readAllLines(Path.of("inputs/day02.txt"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> lines = ReadInput.readInputToList("inputs/day02.txt");
 
         System.out.println(lines.stream().filter(Day02::isSafe).count());  //390
 

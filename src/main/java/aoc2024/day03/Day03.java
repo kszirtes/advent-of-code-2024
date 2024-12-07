@@ -1,19 +1,14 @@
 package aoc2024.day03;
 
+import aoc2024.common.ReadInput;
+
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 public class Day03 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        List<String> lines = null;
-        try {
-            lines = Files.readAllLines(Path.of("inputs/day03.txt"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> lines = ReadInput.readInputToList("inputs/day03.txt");
 
         //System.out.println(lines.size());
         System.out.println(lines.stream().mapToLong(Day03::method1).sum());  //182619815
@@ -121,10 +116,10 @@ public class Day03 {
                         }
                     }
                 }
-                if (mul.contains("don't()")){
+                if (mul.contains("don't()")) {
                     doIt = false;
                 }
-                if (mul.contains("do()")){
+                if (mul.contains("do()")) {
                     doIt = true;
                 }
             }

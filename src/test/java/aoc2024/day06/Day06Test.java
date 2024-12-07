@@ -1,5 +1,6 @@
 package aoc2024.day06;
 
+import aoc2024.common.ReadInput;
 import aoc2024.day04.Day04;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,13 +18,8 @@ class Day06Test {
     char[][] map;
 
     @BeforeEach
-    void setUp() {
-        List<String> lines = new ArrayList<>();
-        try {
-            lines = Files.readAllLines(Path.of("inputs/day06example.txt"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    void setUp() throws IOException {
+        List<String> lines = ReadInput.readInputToList("inputs/day06example.txt");
         map = Day04.generateArray(lines);
     }
 

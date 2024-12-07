@@ -1,20 +1,14 @@
 package aoc2024.day04;
 
+import aoc2024.common.ReadInput;
+
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Day04 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        List<String> lines = new ArrayList<>();
-        try {
-            lines = Files.readAllLines(Path.of("inputs/day04.txt"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> lines = ReadInput.readInputToList("inputs/day04.txt");
 
         System.out.println(calculateXMAS(lines));  //2644
         System.out.println(calculateX_MAS(lines));  //1952
@@ -90,7 +84,6 @@ public class Day04 {
 
         return sum;
     }
-
 
 
     //PART 2
