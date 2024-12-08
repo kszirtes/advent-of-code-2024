@@ -2,12 +2,12 @@ package aoc2024.common;
 
 import java.util.Objects;
 
-public class ArrayPoint {
+public class IndexPairWChar {
 
     private IndexPair indexPair;
     private char direction;
 
-    public ArrayPoint(IndexPair indexPair, char direction) {
+    public IndexPairWChar(IndexPair indexPair, char direction) {
         this.indexPair = indexPair;
         this.direction = direction;
     }
@@ -32,7 +32,7 @@ public class ArrayPoint {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ArrayPoint that = (ArrayPoint) o;
+        IndexPairWChar that = (IndexPairWChar) o;
         return direction == that.direction && Objects.equals(indexPair, that.indexPair);
     }
 
