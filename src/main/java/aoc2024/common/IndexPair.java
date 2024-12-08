@@ -1,4 +1,4 @@
-package aoc2024.day06;
+package aoc2024.common;
 
 import java.util.Objects;
 

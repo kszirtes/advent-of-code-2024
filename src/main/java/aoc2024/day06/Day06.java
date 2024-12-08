@@ -1,95 +1,124 @@
 package aoc2024.day06;
 
-import aoc2024.day04.Day04;
+import aoc2024.common.ArrayPoint;
+import aoc2024.common.IndexPair;
+import aoc2024.common.ReadInput;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Day06 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        List<String> lines = new ArrayList<>();
-        try {
-            lines = Files.readAllLines(Path.of("inputs/day06.txt"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> lines = ReadInput.readInputToList("inputs/day06.txt");
+        HashMap<IndexPair, Character> map = ReadInput.createMap(lines);
 
-        char[][] map = Day04.generateArray(lines);
         System.out.println(countRoute(map));  //4988
+
+        System.out.println(countObstruction(map));   //1697 - ez így kicsit lassú
+
     }
 
-    protected static int countRoute(char[][] map) {
-        int step = 0, row = -1, col = -1;
-        char direction = ' ';
-        for (int x = 0; x < map.length; x++) {
-            for (int y = 0; y < map[x].length; y++) {
-                if (map[x][y] == '<' || map[x][y] == '>' || map[x][y] == '^' || map[x][y] == 'v') {
-                    row = x;
-                    col = y;
-                    step = 1;
-                    direction = map[x][y];
-                    break;
-                }
-            }
+    protected static int countRoute(HashMap<IndexPair, Character> map) {
+        Optional<ArrayPoint> originalPos = getOriginalPos(map);
+        if (originalPos.isPresent()) {
+            int step = 1;
+            Set<IndexPair> visitedPos = new HashSet<>();
+            return countSteps(map, originalPos.get(), step, visitedPos);
         }
-        IndexPair indexPair = new IndexPair(row, col);
-        Set<IndexPair> visitedPos = new HashSet<>();
-        return countSteps(map, indexPair, direction, step, visitedPos);
+        return 0;
     }
 
-    private static int countSteps(char[][] map, IndexPair indexPair, char direction, int steps, Set<IndexPair> visitedPos) {
-        visitedPos.add(indexPair);
-        if (direction == '>') {
-            if (indexPair.getCol() == map[indexPair.getRow()].length - 1) {
-                return visitedPos.size();
-            } else if (map[indexPair.getRow()][indexPair.getCol() + 1] == '#') {
-                direction = 'v';
-                return countSteps(map, indexPair, direction, steps, visitedPos);
-            } else {
-                IndexPair newIndexPair = new IndexPair(indexPair.getRow(), indexPair.getCol() + 1);
-                return countSteps(map, newIndexPair, direction, steps + 1, visitedPos);
-            }
-        } else if (direction == '<') {
-            if (indexPair.getCol() == 0) {
-                return visitedPos.size();
-            } else if (map[indexPair.getRow()][indexPair.getCol() - 1] == '#') {
-                direction = '^';
-                return countSteps(map, indexPair, direction, steps, visitedPos);
-            } else {
-                IndexPair newIndexPair = new IndexPair(indexPair.getRow(), indexPair.getCol() - 1);
-                return countSteps(map, newIndexPair, direction, steps + 1, visitedPos);
-            }
-        } else if (direction == '^') {
-            if (indexPair.getRow() == 0) {
-                return visitedPos.size();
-            } else if (map[indexPair.getRow() - 1][indexPair.getCol()] == '#') {
-                direction = '>';
-                return countSteps(map, indexPair, direction, steps, visitedPos);
-            } else {
-                IndexPair newIndexPair = new IndexPair(indexPair.getRow() - 1, indexPair.getCol());
-                return countSteps(map, newIndexPair, direction, steps + 1, visitedPos);
-            }
-        } else if (direction == 'v') {
-            if (indexPair.getRow() == map.length - 1) {
-                return visitedPos.size();
-            } else if (map[indexPair.getRow() + 1][indexPair.getCol()] == '#') {
-                direction = '<';
-                return countSteps(map, indexPair, direction, steps, visitedPos);
-            } else {
-                IndexPair newIndexPair = new IndexPair(indexPair.getRow() + 1, indexPair.getCol());
-                return countSteps(map, newIndexPair, direction, steps + 1, visitedPos);
-            }
+    private static Optional<ArrayPoint> getOriginalPos(HashMap<IndexPair, Character> map) {
+        Optional<Map.Entry<IndexPair, Character>> start = map.entrySet().stream().filter(e -> findStartChar(e.getValue())).findFirst();
+        if (start.isPresent()) {
+            return Optional.of(new ArrayPoint(start.get().getKey(), start.get().getValue()));
+        } else {
+            return Optional.empty();
         }
-        return visitedPos.size();
+    }
+
+    private static boolean findStartChar(Character entry){
+        return (entry == '<' || entry == '>' || entry == '^' || entry == 'v');
+    }
+
+    private static int countSteps(HashMap<IndexPair, Character> map, ArrayPoint currentPoint, int steps, Set<IndexPair> visitedPos) {
+        visitedPos.add(currentPoint.getIndexPair());
+        IndexPair newIndexPair = provideNextIndexPair(currentPoint);
+        if (map.get(newIndexPair) == null) {
+            return visitedPos.size();
+        } else if (map.get(newIndexPair) == '#') {
+            char direction = provideNextDirection(currentPoint);
+            return countSteps(map, new ArrayPoint(currentPoint.getIndexPair(), direction), steps, visitedPos);
+        } else {
+            return countSteps(map, new ArrayPoint(newIndexPair, currentPoint.getDirection()), steps, visitedPos);
+        }
+    }
+
+    private static IndexPair provideNextIndexPair(ArrayPoint currentAP){
+        if (currentAP.getDirection() == '>'){
+            return new IndexPair(currentAP.getRow(), currentAP.getCol() + 1);
+        } else if (currentAP.getDirection() == '<') {
+            return new IndexPair(currentAP.getRow(), currentAP.getCol() - 1);
+        } else if (currentAP.getDirection() == '^') {
+            return new IndexPair(currentAP.getRow() - 1, currentAP.getCol());
+        } else if (currentAP.getDirection() == 'v') {
+            return new IndexPair(currentAP.getRow() + 1, currentAP.getCol());
+        }
+        return currentAP.getIndexPair();
+    }
+
+    private static char provideNextDirection(ArrayPoint currentAP){
+        if (currentAP.getDirection() == '>'){
+            return 'v';
+        } else if (currentAP.getDirection() == '<') {
+            return '^';
+        } else if (currentAP.getDirection() == '^') {
+            return '>';
+        } else if (currentAP.getDirection() == 'v') {
+            return '<';
+        }
+        return currentAP.getDirection();
     }
 
 
+//PART 2
+
+    protected static long countObstruction(HashMap<IndexPair, Character> map) {
+        Optional<ArrayPoint> originalPos = getOriginalPos(map);
+        if (originalPos.isPresent()) {
+            return map.entrySet().stream()
+                    .filter(e -> e.getValue() == '.')
+                    .filter(e -> isThisObstOccurLoop(map, e.getKey(), originalPos.get()))
+                    .count();
+        }
+        return 0;
+    }
+
+    private static boolean isThisObstOccurLoop(HashMap<IndexPair, Character> map, IndexPair indexPair, ArrayPoint originalPos) {
+        HashMap<IndexPair, Character> mapWObst = new HashMap<>();
+        map.entrySet().forEach(e -> mapWObst.put(e.getKey(), e.getValue()));
+        mapWObst.put(indexPair, '#');
+        Set<ArrayPoint> visitedPos = new HashSet<>();
+        return hasALoop(mapWObst, originalPos, visitedPos);
+    }
+
+    private static boolean hasALoop(HashMap<IndexPair, Character> map, ArrayPoint currentPoint, Set<ArrayPoint> visitedPos) {
+        int size = visitedPos.size();
+        visitedPos.add(currentPoint);
+        if (size == visitedPos.size()){
+            return true;
+        }
+        IndexPair newIndexPair = provideNextIndexPair(currentPoint);
+        if (map.get(newIndexPair) == null) {
+            return false;
+        } else if (map.get(newIndexPair) == '#') {
+            char direction = provideNextDirection(currentPoint);
+            return hasALoop(map, new ArrayPoint(currentPoint.getIndexPair(), direction), visitedPos);
+        } else {
+            return hasALoop(map, new ArrayPoint(newIndexPair, currentPoint.getDirection()), visitedPos);
+        }
+    }
 
 
 }
