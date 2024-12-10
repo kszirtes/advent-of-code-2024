@@ -5,6 +5,7 @@ import aoc2024.common.ReadInput;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Day08 {
     public static void main(String[] args) throws IOException {
@@ -19,21 +20,20 @@ public class Day08 {
 
     protected static long countAntiNodes(List<String> lines) {
         HashMap<IndexPair, Character> map = ReadInput.createMap(lines);
+        Set<Character> antennaCodes = map.entrySet().stream()
+                .map(e -> e.getValue())
+                .filter(s -> s != '.')
+                .collect(Collectors.toSet());
 
-        Set<Character> antennaCodes = new HashSet<>();
-        map.entrySet().forEach(e -> antennaCodes.add(e.getValue())); //pont is benne van
-
-        Set<IndexPair> antinodes = new HashSet<>();
-
-        antennaCodes.stream().filter(s -> s != '.').forEach(s -> antinodes.addAll(countAntiNodesForOneType(map, s)));
+        Set<IndexPair> antinodes = antennaCodes.stream()
+                .flatMap(s -> countAntiNodesForOneType(map, s).stream())
+                .collect(Collectors.toSet());
 
         return validateAntiNodesLocation(antinodes, lines, map).size();
     }
 
     private static Set<IndexPair> validateAntiNodesLocation(Set<IndexPair> rawAntiNodes, List<String> lines, HashMap<IndexPair, Character> map) {
-        Set<IndexPair> antinodes = new HashSet<>();
-        rawAntiNodes.stream().filter(pair -> isInTheMapRange(pair, lines)).forEach(pair -> antinodes.add(pair));
-        return antinodes;
+        return rawAntiNodes.stream().filter(pair -> isInTheMapRange(pair, lines)).collect(Collectors.toSet());
     }
 
     private static boolean isInTheMapRange(IndexPair examine, List<String> lines) {
@@ -43,18 +43,18 @@ public class Day08 {
     }
 
     private static Set<IndexPair> countAntiNodesForOneType(HashMap<IndexPair, Character> map, Character type) {
-        Set<IndexPair> antinodesForOneType = new HashSet<>();
         List<IndexPair> oneType = map.entrySet().stream()
                 .filter(e -> e.getValue() == type).map(e -> e.getKey()).toList();
-        oneType.forEach(e -> antinodesForOneType.addAll(calculateAntiNodesFor1Antenna(e, oneType)));
-        return antinodesForOneType;
+        return oneType.stream()
+                .flatMap(e -> calculateAntiNodesFor1Antenna(e, oneType).stream())
+                .collect(Collectors.toSet());
     }
 
     private static Set<IndexPair> calculateAntiNodesFor1Antenna(IndexPair first, List<IndexPair> antennasList) {
-        Set<IndexPair> antinodesFor2Antennas = new HashSet<>();
-        antennasList.stream().filter(l -> !l.equals(first)).forEach(l -> antinodesFor2Antennas.addAll(calculateAntiNodesForAnAntennaPair(first, l)));
-
-        return antinodesFor2Antennas;
+        return antennasList.stream()
+                .filter(l -> !l.equals(first))
+                .flatMap(l -> calculateAntiNodesForAnAntennaPair(first, l).stream())
+                .collect(Collectors.toSet());
     }
 
     private static List<IndexPair> calculateAntiNodesForAnAntennaPair(IndexPair first, IndexPair second) {
@@ -71,33 +71,33 @@ public class Day08 {
 
     protected static long countAntiNodesUpdatedRule(List<String> lines) {
         HashMap<IndexPair, Character> map = ReadInput.createMap(lines);
+        Set<Character> antennaCodes = map.entrySet().stream()
+                .map(e -> e.getValue())
+                .filter(e -> e != '.')
+                .collect(Collectors.toSet());
 
-        Set<Character> antennaCodes = new HashSet<>();
-        map.entrySet().forEach(e -> antennaCodes.add(e.getValue())); //pont is benne van
-
-        Set<IndexPair> antinodes = new HashSet<>();
-
-        antennaCodes.stream().filter(s -> s != '.').forEach(s -> antinodes.addAll(countAntiNodesForOneTypeUpdatedRules(map, s, lines)));
+        Set<IndexPair> antinodes = antennaCodes.stream()
+                .flatMap(s -> countAntiNodesForOneTypeUpdatedRules(map, s, lines).stream())
+                .collect(Collectors.toSet());
 
         return antinodes.size();
     }
 
 
     private static Set<IndexPair> countAntiNodesForOneTypeUpdatedRules(HashMap<IndexPair, Character> map, Character type, List<String> lines) {
-        Set<IndexPair> antinodesForOneType = new HashSet<>();
         List<IndexPair> oneType = map.entrySet().stream()
                 .filter(e -> e.getValue() == type).map(e -> e.getKey()).toList();
-        oneType.forEach(e -> antinodesForOneType.addAll(calculateAntiNodesFor1AntennaUpdatedRules(e, oneType, lines)));
-        return antinodesForOneType;
+
+        return oneType.stream()
+                .flatMap(e -> calculateAntiNodesFor1AntennaUpdatedRules(e, oneType, lines).stream())
+                .collect(Collectors.toSet());
     }
 
     private static Set<IndexPair> calculateAntiNodesFor1AntennaUpdatedRules(IndexPair first, List<IndexPair> antennasList, List<String> lines) {
-        Set<IndexPair> antinodesForAnAntenna = new HashSet<>();
-        antennasList.stream()
+        return antennasList.stream()
                 .filter(l -> !l.equals(first))
-                .forEach(l -> antinodesForAnAntenna.addAll(calcAntiNodesForAnAntennaPairUpdatedRules(first, l, lines)));
-
-        return antinodesForAnAntenna;
+                .flatMap(l -> calcAntiNodesForAnAntennaPairUpdatedRules(first, l, lines).stream())
+                .collect(Collectors.toSet());
     }
 
     private static Set<IndexPair> calcAntiNodesForAnAntennaPairUpdatedRules(IndexPair first, IndexPair second, List<String> lines) {
