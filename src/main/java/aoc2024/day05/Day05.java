@@ -64,18 +64,6 @@ public class Day05 {
                 .filter(pair -> isThisPagBadPos(print, rules.get(pair.getFirst()), pair.getSecond()))
                 .count();
         return (pageInBadPos == 0);
-
-//        for (int i = 0; i < print.size(); i++) {
-//            List<Integer> pagesLater = rules.get(print.get(i));
-//            for (int j = 0; j < i; j++) {
-//                if (pagesLater != null) {
-//                    if (pagesLater.contains(print.get(j))) {
-//                        return false;
-//                    }
-//                }
-//            }
-//        }
-//        return true;
     }
 
     private static boolean isThisPagBadPos(List<Integer> print, List<Integer> pagesLater, Integer index) {
@@ -90,13 +78,6 @@ public class Day05 {
     }
 
     protected static int returnMiddlePage(List<Integer> pages) {
-//        int size = pages.size();
-//        int returnIndex = 0;
-//        if (size % 2 == 0) {
-//            returnIndex = (size / 2) - 1; // na erre nincs instrukció, most legyen az egyszerűbb
-//        } else {
-//            returnIndex = size / 2;  // úgy néz ki, csak páratlan size jön be...
-//        }
         return pages.get(pages.size() / 2);
     }
 
