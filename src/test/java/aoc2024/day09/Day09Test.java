@@ -16,4 +16,11 @@ class Day09Test {
         Assertions.assertEquals(60, Day09.calculateChecksum(line1)); //022111222
         Assertions.assertEquals(1928, Day09.calculateChecksum(line2));
     }
+
+    @Test
+    void calculateChecksumPart2() {
+        Assertions.assertEquals(132, Day09.calculateChecksumPart2(line1)); //3+4+5+2*(10+11+12+13+14)
+        Assertions.assertEquals(2858, Day09.calculateChecksumPart2(line2));
+    }
+
 }
