@@ -20,6 +20,7 @@ public class ReadInput {
         return lines;
     }
 
+
     public static HashMap<IndexPair, Character> createMap(List<String> lines) {
         HashMap<IndexPair, Character> map = new HashMap<>();
         for (int i = 0; i < lines.size(); i++) {
